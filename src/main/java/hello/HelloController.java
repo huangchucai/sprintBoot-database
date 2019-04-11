@@ -1,6 +1,6 @@
 package hello;
 
-import hello.services.User;
+import hello.entity.User;
 import hello.services.UserService;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;

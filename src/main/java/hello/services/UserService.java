@@ -1,5 +1,6 @@
 package hello.services;
 
+import hello.entity.User;
 import hello.mapper.UserMapper;
 
 import javax.inject.Inject;
