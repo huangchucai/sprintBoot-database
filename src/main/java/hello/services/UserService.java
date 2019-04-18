@@ -1,9 +1,11 @@
 package hello.services;
 
+import hello.entity.User;
 import hello.mapper.UserMapper;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-
+@Component
 public class UserService {
     private UserMapper userMapper;
 
