@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 @Controller
@@ -21,6 +22,7 @@ public class AutoController {
     private UserDetailsService userDetailsService;
     private AuthenticationManager authenticationManager;
 
+    @Inject
     public AutoController(UserDetailsService userDetailsService, AuthenticationManager authenticationManager) {
         this.userDetailsService = userDetailsService;
         this.authenticationManager = authenticationManager;
@@ -37,7 +39,7 @@ public class AutoController {
     public Result login(@RequestBody Map<String, String> usernameAndPassword) {
         String username = usernameAndPassword.get("username");
         String password = usernameAndPassword.get("password");
-        UserDetails userDetails = null;
+        UserDetails userDetails;
         try {
             // 从数据库中拿取东西
             userDetails = userDetailsService.loadUserByUsername(username);
