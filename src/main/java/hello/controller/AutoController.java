@@ -1,6 +1,7 @@
 package hello.controller;
 
 import hello.entity.User;
+import hello.services.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,19 +20,26 @@ import java.util.Map;
 
 @Controller
 public class AutoController {
-    private UserDetailsService userDetailsService;
+    private UserService userService;
     private AuthenticationManager authenticationManager;
 
     @Inject
-    public AutoController(UserDetailsService userDetailsService, AuthenticationManager authenticationManager) {
-        this.userDetailsService = userDetailsService;
+    public AutoController(UserService userService,
+                          AuthenticationManager authenticationManager) {
+        this.userService = userService;
         this.authenticationManager = authenticationManager;
     }
 
     @GetMapping("/auth")
     @ResponseBody
     public Object auth() {
-        return new Result("ok", "用户没有登录", false);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        if (loggedInUser == null) {
+            return new Result("ok", "用户没有登录", false);
+        } else {
+            return new Result("ok", "", true, loggedInUser);
+        }
     }
 
     @PostMapping("/auth/login")
@@ -42,18 +50,24 @@ public class AutoController {
         UserDetails userDetails;
         try {
             // 从数据库中拿取东西
-            userDetails = userDetailsService.loadUserByUsername(username);
+            userDetails = userService.loadUserByUsername(username);
         } catch (UsernameNotFoundException e) {
             return new Result("fail", "用户名不存在", false);
         }
-
+        /**
+         * auth {
+         *     Authentication  鉴权  你是不是你自己申明的自己
+         *     Authorization  验权  你有没有访问那个资源的权限
+         * }
+         */
+        // 鉴权  把用户名和密码比对一下，看看这个人是不是那个要登入的这个人
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
         try {
             authenticationManager.authenticate(token);
             SecurityContextHolder.getContext().setAuthentication(token);
 
-            User loggedInUser = new User(1, "张三");
-            return new Result("ok", "登录成功", true, loggedInUser);
+            return new Result("ok", "登录成功", true,
+                    userService.getUserByUsername(username));
         } catch (BadCredentialsException e) {
             return new Result("fail", "密码不正确", false);
         }
