@@ -10,8 +10,4 @@
 
     <!--<bean id="userService" class="hello.services.UserService">-->
     <!--</bean>-->
-
-    <bean id="orderService" class="hello.services.OrderService">
-    </bean>
-
 </beans>

@@ -73,6 +73,42 @@ public class AutoController {
         }
     }
 
+    @PostMapping("/auth/register")
+    @ResponseBody
+    public Result register(@RequestBody Map<String, String> usernameAndPassword) {
+        String username = usernameAndPassword.get("username");
+        String password = usernameAndPassword.get("password");
+        if (username == null || password == null) {
+            return new Result("fail", "username/password == null", false);
+        }
+        if (username.length() < 1 || username.length() > 15) {
+            return new Result("fail", "invalid username", false);
+        }
+        if (password.length() < 6 || username.length() > 16) {
+            return new Result("fail", "invalid password", false);
+        }
+        User user = userService.getUserByUsername(username);
+        if (user == null) {
+            userService.save(username, password);
+            return new Result("ok", "success~~", false);
+        } else {
+            return new Result("ok", "user aready exist", false);
+        }
+    }
+
+    @GetMapping("/auth/logout")
+    @ResponseBody
+    public Result layout() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User loggedInUser = userService.getUserByUsername(username);
+        if (loggedInUser == null) {
+            return new Result("fail", "用户没有登录", false);
+        } else {
+            SecurityContextHolder.clearContext();
+            return new Result("ok", "注销成功", true);
+        }
+    }
+
     public static class Result {
         String status;
         String msg;
